@@ -42,7 +42,7 @@ app.get("/usuarios", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Erro ao buscar usuários", detalhe: err.message });
+    res.send("Erro ao buscar usuários: " + err.message);
   }
 });
 
