@@ -46,7 +46,6 @@ app.get("/usuarios", async (req, res) => {
   }
 });
 
-// --- POST: cadastra um usuário com foto ---
 app.post("/usuarios", upload.single("foto"), async (req, res) => {
   try {
     const { nome, idade, sexo, cidade, bio } = req.body;
@@ -54,23 +53,26 @@ app.post("/usuarios", upload.single("foto"), async (req, res) => {
 
     // Validação mínima
     if (!nome || !idade || !sexo || !cidade || !bio) {
-      return res.send("Todos os campos são obrigatórios.");
+      return res.status(400).json({ message: "Todos os campos são obrigatórios." });
     }
 
     const result = await pool.query(
       `INSERT INTO users (nome, idade, sexo, cidade, bio, foto)
        VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-      [nome, idade, sexo, cidade, bio, foto]
+      [nome, parseInt(idade), sexo, cidade, bio, foto]
     );
 
-    console.log("Usuário cadastrado:", result);
+    console.log("Usuário cadastrado:", result.rows[0]);
 
-    res.send("Usuário cadastrado com sucesso!");
+    // Retorna JSON para o frontend
+    res.json({ message: "Usuário cadastrado com sucesso!", usuario: result.rows[0] });
+
   } catch (err) {
-    console.error(err);
-    res.send("Erro ao cadastrar usuário: " + err.message);
+    console.error("Erro ao cadastrar usuário:", err);
+    res.status(500).json({ message: "Erro ao cadastrar usuário", detalhe: err.message });
   }
 });
+
 
 // --- Inicia servidor ---
 const PORT = process.env.PORT || 8080;
