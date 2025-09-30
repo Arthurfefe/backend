@@ -54,7 +54,7 @@ app.post("/usuarios", upload.single("foto"), async (req, res) => {
 
     // Validação mínima
     if (!nome || !idade || !sexo || !cidade || !bio) {
-      return res.status(400).json({ message: "Preencha todos os campos obrigatórios" });
+      return res.send("Todos os campos são obrigatórios.");
     }
 
     const result = await pool.query(
