@@ -63,6 +63,8 @@ app.post("/usuarios", upload.single("foto"), async (req, res) => {
       [nome, idade, sexo, cidade, bio, foto]
     );
 
+    console.log("Usuário cadastrado:", result);
+
     res.send("Usuário cadastrado com sucesso!");
   } catch (err) {
     console.error(err);
