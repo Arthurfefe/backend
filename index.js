@@ -81,7 +81,7 @@ app.get("/usuarios/sorteio", async (req, res) => {
       SELECT id, nome, idade, bio, foto
       FROM users
       ORDER BY RANDOM()
-      LIMIT 5
+      LIMIT 1
     `);
 
     console.log("Registros do DB:", result.rows);
@@ -98,4 +98,5 @@ app.get("/usuarios/sorteio", async (req, res) => {
 // --- Inicia servidor ---
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+
 
