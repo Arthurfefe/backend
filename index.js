@@ -74,6 +74,28 @@ app.post("/usuarios", upload.single("foto"), async (req, res) => {
 });
 
 
+
+app.get("/usuarios/sorteio", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, nome, idade, bio, foto
+      FROM users
+      ORDER BY RANDOM()
+      LIMIT 5
+    `);
+
+    console.log("Registros do DB:", result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erro ao buscar usuários para sorteio:", err);
+    res.json([]);
+  }
+});
+
+
+
+
 // --- Inicia servidor ---
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+
