@@ -90,7 +90,7 @@ app.get("/usuarios/sorteio", async (req, res) => {
       SELECT id, nome, idade, sexo, cidade, bio, foto
       FROM users
       ORDER BY RANDOM()
-      LIMIT 5
+      LIMIT 1
     `);
     console.log("Registros retornados:", result.rows);
     res.json(result.rows);
@@ -105,6 +105,7 @@ app.get("/usuarios/sorteio", async (req, res) => {
  //gostos 
 
  
+
 
 
 
