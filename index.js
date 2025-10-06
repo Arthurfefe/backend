@@ -9,21 +9,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// --- Pasta de uploads ---
-const uploadDir = "uploads";
+// Garante que a pasta "uploads" exista
+const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir); // cria a pasta se não existir
+  fs.mkdirSync(uploadDir);
 }
 
-// --- Configuração Multer ---
+// Configuração do armazenamento
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
+  destination: (req, file, cb) => {
+    cb(null, uploadDir); // salva dentro da pasta uploads/
+  },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    // Gera um nome único (ex: 1728220395932-foto.jpg)
+    const ext = path.extname(file.originalname);
+    const nomeArquivo = Date.now() + "-" + file.originalname.replace(/\s+/g, "_");
+    cb(null, nomeArquivo);
   }
 });
+
 const upload = multer({ storage });
 
 // --- Configuração do Postgres ---
@@ -51,7 +57,6 @@ app.post("/usuarios", upload.single("foto"), async (req, res) => {
     const { nome, idade, sexo, cidade, bio } = req.body;
     const foto = req.file ? req.file.filename : null;
 
-    // Validação mínima
     if (!nome || !idade || !sexo || !cidade || !bio) {
       return res.status(400).json({ message: "Todos os campos são obrigatórios." });
     }
@@ -64,7 +69,6 @@ app.post("/usuarios", upload.single("foto"), async (req, res) => {
 
     console.log("Usuário cadastrado:", result.rows[0]);
 
-    // Retorna JSON para o frontend
     res.json({ message: "Usuário cadastrado com sucesso!", usuario: result.rows[0] });
 
   } catch (err) {
@@ -74,29 +78,37 @@ app.post("/usuarios", upload.single("foto"), async (req, res) => {
 });
 
 
+// --- Inicia servidor ---
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
+
+//afff
 app.get("/usuarios/sorteio", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, nome, idade, bio, foto
+      SELECT id, nome, idade, sexo, cidade, bio, foto, gostos
       FROM users
       ORDER BY RANDOM()
-      LIMIT 1
+      LIMIT 5
     `);
-
-    console.log("Registros do DB:", result.rows);
+    console.log("Registros retornados:", result.rows);
     res.json(result.rows);
   } catch (err) {
-    console.error("Erro ao buscar usuários para sorteio:", err);
+    console.error(err);
     res.json([]);
   }
 });
 
 
 
+ //gostos 
 
-// --- Inicia servidor ---
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+ 
+
+
+
+
+
 
 
