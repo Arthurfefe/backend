@@ -87,7 +87,7 @@ app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 app.get("/usuarios/sorteio", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, nome, idade, sexo, cidade, bio, foto, gostos
+      SELECT id, nome, idade, sexo, cidade, bio, foto
       FROM users
       ORDER BY RANDOM()
       LIMIT 5
@@ -105,6 +105,7 @@ app.get("/usuarios/sorteio", async (req, res) => {
  //gostos 
 
  
+
 
 
 
